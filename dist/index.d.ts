@@ -51,4 +51,11 @@ declare function burnTokens(privateKey: string, amount: number, eventData?: stri
 
 declare function processTicketImage(aid_id: BenefitCodeTypeNum, imageFile: TicketProcessingFileType, authorization: string): Promise<TicketProcessingResultType>;
 
-export { type AidProductType, type BenefitCodeType, type BenefitCodeTypeNum, BenefitLabelsType, type BenefitsType, type ContractRoleType, type MerchantQRDataType, QR_CODE_PREFIX, type RNFileType, type RoleIdType, RolesType, type TicketProcessingFileType, type TicketProcessingResultType, burnTokens, generateCitizenQR, generateMechantQR, getCitizenBenefitsType, getPartyPermission, getTokenBalance, parseMerchantQR, processTicketImage, sendTokens };
+type EnvVarsType = {
+    BACK_END_URL: string;
+    BLOCKCHAIN_RPC_URL: string;
+    SMART_CONTRACT_ADDRESS: string;
+};
+declare function initTokenizationLibEnvVars(newVars: Partial<EnvVarsType>): void;
+
+export { type AidProductType, type BenefitCodeType, type BenefitCodeTypeNum, BenefitLabelsType, type BenefitsType, type ContractRoleType, type MerchantQRDataType, QR_CODE_PREFIX, type RNFileType, type RoleIdType, RolesType, type TicketProcessingFileType, type TicketProcessingResultType, burnTokens, generateCitizenQR, generateMechantQR, getCitizenBenefitsType, getPartyPermission, getTokenBalance, initTokenizationLibEnvVars, parseMerchantQR, processTicketImage, sendTokens };

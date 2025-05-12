@@ -100,6 +100,6 @@ export async function burnTokens(
 
     const message =
       e.reason || e.data?.message || e.message || "Unknown Burn Tokens error";
-    throw new Error(`Butn Tokens Error: ${message}`);
+    throw new Error(`Burn Tokens Error: ${message}`);
   }
 }

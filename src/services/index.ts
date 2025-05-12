@@ -1,4 +1,4 @@
-import { BACK_END_URL } from "../../env";
+import { getEnvVars } from "../config";
 import {
   BenefitCodeTypeNum,
   TicketProcessingFileType,
@@ -11,6 +11,8 @@ export async function processTicketImage(
   imageFile: TicketProcessingFileType,
   authorization: string
 ): Promise<TicketProcessingResultType> {
+  const { BACK_END_URL } = getEnvVars();
+
   let file;
 
   if (isReactNativeFile(imageFile)) {

@@ -29,6 +29,7 @@ __export(index_exports, {
   getCitizenBenefitsType: () => getCitizenBenefitsType,
   getPartyPermission: () => getPartyPermission,
   getTokenBalance: () => getTokenBalance,
+  initTokenizationLibEnvVars: () => initTokenizationLibEnvVars,
   parseMerchantQR: () => parseMerchantQR,
   processTicketImage: () => processTicketImage,
   sendTokens: () => sendTokens
@@ -1675,13 +1676,22 @@ var IzToken__factory = class extends import_ethers.ContractFactory {
 IzToken__factory.bytecode = _bytecode;
 IzToken__factory.abi = _abi;
 
-// env.ts
-var BLOCKCHAIN_RPC_URL = "https://sepolia.drpc.org";
-var SMART_CONTRACT_ADDRESS = "0xBd3E2971e62195E4a2Ef20c0036f31d0bBB025cF";
-var BACK_END_URL = "https://ssitizens-develop-backend-dd9159235843.herokuapp.com";
+// src/config.ts
+var ENV_VARS = {
+  BACK_END_URL: "",
+  BLOCKCHAIN_RPC_URL: "",
+  SMART_CONTRACT_ADDRESS: ""
+};
+function initTokenizationLibEnvVars(newVars) {
+  ENV_VARS = { ...ENV_VARS, ...newVars };
+}
+function getEnvVars() {
+  return ENV_VARS;
+}
 
 // src/utils/contract.ts
 function getProvider() {
+  const { BLOCKCHAIN_RPC_URL } = getEnvVars();
   return new import_ethers2.ethers.providers.JsonRpcProvider(BLOCKCHAIN_RPC_URL);
 }
 function getSigner(privateKey) {
@@ -1689,6 +1699,7 @@ function getSigner(privateKey) {
   return new import_ethers2.ethers.Wallet(privateKey, provider);
 }
 function getContract(signer) {
+  const { SMART_CONTRACT_ADDRESS } = getEnvVars();
   const provider = getProvider();
   return IzToken__factory.connect(SMART_CONTRACT_ADDRESS, signer || provider);
 }
@@ -1771,7 +1782,7 @@ async function burnTokens(privateKey, amount, eventData) {
     const e = error;
     console.error(e);
     const message = e.reason || e.data?.message || e.message || "Unknown Burn Tokens error";
-    throw new Error(`Butn Tokens Error: ${message}`);
+    throw new Error(`Burn Tokens Error: ${message}`);
   }
 }
 
@@ -1782,6 +1793,7 @@ function isReactNativeFile(file) {
 
 // src/services/index.ts
 async function processTicketImage(aid_id, imageFile, authorization) {
+  const { BACK_END_URL } = getEnvVars();
   let file;
   if (isReactNativeFile(imageFile)) {
     file = {
@@ -1828,6 +1840,7 @@ async function processTicketImage(aid_id, imageFile, authorization) {
   getCitizenBenefitsType,
   getPartyPermission,
   getTokenBalance,
+  initTokenizationLibEnvVars,
   parseMerchantQR,
   processTicketImage,
   sendTokens
