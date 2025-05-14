@@ -20,14 +20,16 @@ export function generateCitizenQR(didOrAddress: string): string {
  * @returns A formatted QR string with the MERCHANT prefix and serialized data.
  */
 export function generateMechantQR(
-  walletAddress: string,
+  merchantAddress: string,
+  citizenAddress: string,
   amount: string,
   concept: string
 ): string {
   const qr_prefix = QR_CODE_PREFIX.MERCHANT;
 
   const data: MerchantQRDataType = {
-    walletAddress,
+    merchantAddress,
+    citizenAddress,
     amount,
     concept,
   };
@@ -50,14 +52,14 @@ export function parseMerchOrCitizenQR(
 
   if (prefix === QR_CODE_PREFIX.MERCHANT) {
     try {
-      const parsed = JSON.parse(data);
-      const { walletAddress, amount, concept } = parsed;
+      const parsedData = JSON.parse(data) as MerchantQRDataType;
+      const { merchantAddress, citizenAddress, amount, concept } = parsedData;
 
-      if (!walletAddress || !amount || !concept) {
+      if (!merchantAddress || !citizenAddress || !amount || !concept) {
         throw new Error("Lib error: Missing fields in QR data");
       }
 
-      return { walletAddress, amount, concept };
+      return parsedData;
     } catch (err) {
       throw new Error("Lib error: Invalid QR data format");
     }

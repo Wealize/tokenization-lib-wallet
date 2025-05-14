@@ -7,7 +7,8 @@ type RoleIdType = 0 | 1 | 2;
 type BenefitCodeType = "0x00" | "0x01" | "0x02";
 type BenefitCodeTypeNum = 0 | 1 | 2;
 type MerchantQRDataType = {
-    walletAddress: string;
+    merchantAddress: string;
+    citizenAddress: string;
     amount: string;
     concept: string;
 };
@@ -43,7 +44,7 @@ declare function generateCitizenQR(didOrAddress: string): string;
  * @param concept - The payment concept or description.
  * @returns A formatted QR string with the MERCHANT prefix and serialized data.
  */
-declare function generateMechantQR(walletAddress: string, amount: string, concept: string): string;
+declare function generateMechantQR(merchantAddress: string, citizenAddress: string, amount: string, concept: string): string;
 /**
  * Parses a QR code string and determines whether it corresponds to a Merchant or Citizen QR.
  * @param qr - The scanned QR code string.
