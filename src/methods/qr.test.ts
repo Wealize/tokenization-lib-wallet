@@ -1,6 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { QR_CODE_PREFIX } from "../constants";
-import { generateCitizenQR, generateMechantQR, parseMerchantQR } from "./qr";
+import {
+  generateCitizenQR,
+  generateMechantQR,
+  parseMerchOrCitizenQR,
+} from "./qr";
 
 const validData = {
   walletAddress: "0xABC123",
@@ -10,22 +14,22 @@ const validData = {
 
 const validQR = `${QR_CODE_PREFIX.MERCHANT}-${JSON.stringify(validData)}`;
 
-describe("parseMerchantQR", () => {
+describe("parseMerchOrCitizenQR", () => {
   it("parses valid QR string correctly", () => {
-    const result = parseMerchantQR(validQR);
+    const result = parseMerchOrCitizenQR(validQR);
     expect(result).toEqual(validData);
   });
 
   it("throws error for invalid prefix", () => {
     const qr = `INVALID-${JSON.stringify(validData)}`;
-    expect(() => parseMerchantQR(qr)).toThrowError(
+    expect(() => parseMerchOrCitizenQR(qr)).toThrowError(
       "Lib error: Invalid QR prefix"
     );
   });
 
   it("throws error for malformed JSON", () => {
     const qr = `${QR_CODE_PREFIX.MERCHANT}-not-a-json`;
-    expect(() => parseMerchantQR(qr)).toThrowError(
+    expect(() => parseMerchOrCitizenQR(qr)).toThrowError(
       "Lib error: Invalid QR data format"
     );
   });

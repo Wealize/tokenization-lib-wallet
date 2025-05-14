@@ -4,52 +4,56 @@ import {
   getLatestBlockTimestamp,
   getSigner,
 } from "../utils/contract";
-import {
-  ContractRoleType,
-  RoleIdType,
-  RolesType,
-  BenefitCodeType,
-  BenefitLabelsType,
-  BenefitsType,
-} from "../types";
+import { RoleIdType, BenefitCodeType } from "../types";
 
+/**
+ * Retrieves the token balance of a given address.
+ * @param address - The wallet address to query.
+ * @returns The token balance formatted as a string.
+ */
 export async function getTokenBalance(address: string): Promise<string> {
   const contract = getContract();
   const balance = await contract.balanceOf(address);
   return ethers.utils.formatUnits(balance, 18);
 }
 
+/**
+ * Retrieves the benefit type code assigned to a citizen's address.
+ * @param address - The citizen's wallet address.
+ * @returns The benefit code as a hexadecimal string.
+ */
 export async function getCitizenBenefitsType(
   address: string
-): Promise<BenefitsType> {
+): Promise<BenefitCodeType> {
   const contract = getContract();
   const benefit = (await contract.getAttachedData(address)) as BenefitCodeType;
-
-  const BENEFIT_MAP: Record<BenefitCodeType, BenefitsType> = {
-    "0x00": BenefitLabelsType.NONE,
-    "0x01": BenefitLabelsType.STATIONERY,
-    "0x02": BenefitLabelsType.GROCERY,
-  };
-
-  return BENEFIT_MAP[benefit] ?? BenefitLabelsType.NONE;
+  return benefit;
 }
 
-export async function getPartyPermission(
-  address: string
-): Promise<ContractRoleType> {
+/**
+ * Retrieves the permission role assigned to an address at the latest block timestamp.
+ * @param address - The user's wallet address.
+ * @returns The role ID associated with the address.
+ */
+export async function getPartyPermission(address: string): Promise<RoleIdType> {
   const contract = getContract();
   const timestamp = await getLatestBlockTimestamp();
-  const role = await contract.partyPermission(address, timestamp);
-
-  const ROLES_MAP: Record<RoleIdType, ContractRoleType> = {
-    0: RolesType.NONE,
-    1: RolesType.CITIZEN,
-    2: RolesType.MERCHANT,
-  };
-
-  return ROLES_MAP[role as RoleIdType] ?? RolesType.NONE;
+  const role = (await contract.partyPermission(
+    address,
+    timestamp
+  )) as RoleIdType;
+  return role;
 }
 
+/**
+ * Transfers tokens from the user's wallet to another address.
+ * Uses `transferFromWithData` to attach additional event data.
+ * @param privateKey - The sender's private key.
+ * @param toAddress - The recipient's wallet address.
+ * @param amount - The amount of tokens to transfer.
+ * @param eventData - Optional event data to attach.
+ * @returns The transaction hash of the transfer.
+ */
 export async function sendTokens(
   privateKey: string,
   toAddress: string,
@@ -80,6 +84,13 @@ export async function sendTokens(
   }
 }
 
+/**
+ * Burns (redeems) a specific amount of tokens from the user's wallet.
+ * @param privateKey - The wallet's private key.
+ * @param amount - The amount of tokens to burn.
+ * @param eventData - Optional event data to attach.
+ * @returns The transaction hash of the burn operation.
+ */
 export async function burnTokens(
   privateKey: string,
   amount: number,

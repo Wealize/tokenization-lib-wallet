@@ -6,9 +6,31 @@ Librería para aplicaciones web y movil que centraliza la lógica de:
 2. Interacción con el contrato ERC20 "izToken"
 3. Llamada al backend para procesar tickets.
 
-## 1. Generación y parsing de QRs para Ciudadanos y Comercios.
+## Configuración de Variables de Entorno
 
-### Funcionalidaes
+La librería necesita inicializar las variables de entorno una vez al inicio de la aplicación (antes de usar cualquier funcionalidad).
+
+#### Método
+
+```
+initTokenizationLibEnvVars(newVars: Partial<{ BACK_END_URL: string; BLOCKCHAIN_RPC_URL: string; SMART_CONTRACT_ADDRESS: string }>): void
+```
+
+Este método debe llamarse una sola vez al iniciar la app (por ejemplo en el App.tsx de tu aplicación), y es necesario para que la librería tenga acceso al backend y blockchain. Esta función fusiona las variables proporcionadas con la configuración interna. Puedes llamarla varias veces, pero lo recomendable es hacerlo solo una vez al inicio.
+
+```ts
+import { initTokenizationLibEnvVars } from "tokenization-library";
+
+initTokenizationLibEnvVars({
+  BACK_END_URL: "https://api.example.com",
+  SMART_CONTRACT_ADDRESS: "0x123456789abcdef",
+  BLOCKCHAIN_RPC_URL: "https://rpc.sepolia.org",
+});
+```
+
+## Funcionalidades
+
+### 1. Generación y parsing de QRs para Ciudadanos y Comercios.
 
 Generación de strings para posterior utilización en generación de QRs
 
@@ -20,9 +42,7 @@ Generación de strings para posterior utilización en generación de QRs
 
 - parseMerchantQR(qr: string) > Util que prsea un QR generado por generateMechantQR() y valida su estructura. Retorna: { walletAddress, amount, concept }.
 
-## 2. Interacción con el contrato ERC20 "izToken"
-
-### Funcionalidaes
+### 2. Interacción con el contrato ERC20 "izToken"
 
 Integra ethers.js para comunicarse con los typechains pre generados del contrato izToken.
 
@@ -34,9 +54,7 @@ Integra ethers.js para comunicarse con los typechains pre generados del contrato
 - sendTokens(privateKey: string, toAddress: string, amount: number, eventData?: string) > Envía tokens a otra dirección con data opcional. Devuelve el hash de la transacción.
 - burnTokens(privateKey: string, amount: number, eventData?: string) > Realiza un burn de tokens en el balance del usuario. Devuelve el hash de la transacción.
 
-## 3. Llamada al backend para procesar tickets.
-
-### Funcionalidaes
+### 3. Llamada al backend para procesar tickets.
 
 Envia tickets en formato File | Blob | RNFileType (Ver definicion de types) a la API de backend.
 

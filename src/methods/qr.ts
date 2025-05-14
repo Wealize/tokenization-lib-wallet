@@ -1,12 +1,24 @@
 import { QR_CODE_PREFIX } from "../constants";
-import { MerchantQRDataType } from "../types";
+import { CitizenQRDataType, MerchantQRDataType } from "../types";
 
-export function generateCitizenQR(did: string): string {
+/**
+ * Generates a QR code string for a Citizen DID.
+ * @param didOrAddress - The DID (Decentralized Identifier) or address of the citizen (string).
+ * @returns A formatted QR string with the CITIZEN prefix.
+ */
+export function generateCitizenQR(didOrAddress: string): string {
   const qr_prefix = QR_CODE_PREFIX.CITIZEN;
 
-  return `${qr_prefix}-${did}`;
+  return `${qr_prefix}-${didOrAddress}`;
 }
 
+/**
+ * Generates a QR code string for a Merchant payment request.
+ * @param walletAddress - The merchant's wallet address.
+ * @param amount - The requested payment amount.
+ * @param concept - The payment concept or description.
+ * @returns A formatted QR string with the MERCHANT prefix and serialized data.
+ */
 export function generateMechantQR(
   walletAddress: string,
   amount: string,
@@ -25,23 +37,33 @@ export function generateMechantQR(
   return `${qr_prefix}-${strData}`;
 }
 
-export function parseMerchantQR(qr: string): MerchantQRDataType {
-  const [prefix, json] = qr.split("-", 2);
+/**
+ * Parses a QR code string and determines whether it corresponds to a Merchant or Citizen QR.
+ * @param qr - The scanned QR code string.
+ * @returns The parsed QR data object (either MerchantQRDataType or CitizenQRDataType).
+ * @throws If the QR prefix is invalid or the data format is incorrect.
+ */
+export function parseMerchOrCitizenQR(
+  qr: string
+): MerchantQRDataType | CitizenQRDataType {
+  const [prefix, data] = qr.split("-", 2);
 
-  if (prefix !== QR_CODE_PREFIX.MERCHANT) {
-    throw new Error("Lib error: Invalid QR prefix");
-  }
+  if (prefix === QR_CODE_PREFIX.MERCHANT) {
+    try {
+      const parsed = JSON.parse(data);
+      const { walletAddress, amount, concept } = parsed;
 
-  try {
-    const data = JSON.parse(json);
-    const { walletAddress, amount, concept } = data;
+      if (!walletAddress || !amount || !concept) {
+        throw new Error("Lib error: Missing fields in QR data");
+      }
 
-    if (!walletAddress || !amount || !concept) {
-      throw new Error("Lib error: Missing fields in QR data");
+      return { walletAddress, amount, concept };
+    } catch (err) {
+      throw new Error("Lib error: Invalid QR data format");
     }
-
-    return { walletAddress, amount, concept };
-  } catch (err) {
-    throw new Error("Lib error: Invalid QR data format");
+  } else if (prefix === QR_CODE_PREFIX.CITIZEN) {
+    return { address: data };
+  } else {
+    throw new Error("Lib error: Invalid QR prefix");
   }
 }

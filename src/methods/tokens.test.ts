@@ -53,13 +53,13 @@ describe("tokens utils", () => {
   it("getCitizenBenefitsType returns correct label", async () => {
     mockContract.getAttachedData.mockResolvedValue("0x01");
     const result = await getCitizenBenefitsType("0xABC123");
-    expect(result).toBe("STATIONERY");
+    expect(result).toBe("0x01");
   });
 
   it("getPartyPermission returns correct role", async () => {
     mockContract.partyPermission.mockResolvedValue(2);
     const result = await getPartyPermission("0xABC123");
-    expect(result).toBe("MERCHANT");
+    expect(result).toBe(2);
   });
 
   it("sendTokens returns tx hash", async () => {
@@ -86,7 +86,7 @@ describe("tokens utils", () => {
   it("burnTokens throws formatted error on fail", async () => {
     mockContract.redeemFrom.mockRejectedValue({ message: "Boom" });
     await expect(burnTokens("privKey", 1)).rejects.toThrow(
-      "Butn Tokens Error: Boom"
+      "Burn Tokens Error: Boom"
     );
   });
 });

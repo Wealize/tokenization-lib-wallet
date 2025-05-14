@@ -20,9 +20,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
-  BenefitLabelsType: () => BenefitLabelsType,
   QR_CODE_PREFIX: () => QR_CODE_PREFIX,
-  RolesType: () => RolesType,
   burnTokens: () => burnTokens,
   generateCitizenQR: () => generateCitizenQR,
   generateMechantQR: () => generateMechantQR,
@@ -30,7 +28,7 @@ __export(index_exports, {
   getPartyPermission: () => getPartyPermission,
   getTokenBalance: () => getTokenBalance,
   initTokenizationLibEnvVars: () => initTokenizationLibEnvVars,
-  parseMerchantQR: () => parseMerchantQR,
+  parseMerchOrCitizenQR: () => parseMerchOrCitizenQR,
   processTicketImage: () => processTicketImage,
   sendTokens: () => sendTokens
 });
@@ -43,9 +41,9 @@ var QR_CODE_PREFIX = {
 };
 
 // src/methods/qr.ts
-function generateCitizenQR(did) {
+function generateCitizenQR(didOrAddress) {
   const qr_prefix = QR_CODE_PREFIX.CITIZEN;
-  return `${qr_prefix}-${did}`;
+  return `${qr_prefix}-${didOrAddress}`;
 }
 function generateMechantQR(walletAddress, amount, concept) {
   const qr_prefix = QR_CODE_PREFIX.MERCHANT;
@@ -57,20 +55,23 @@ function generateMechantQR(walletAddress, amount, concept) {
   const strData = JSON.stringify(data);
   return `${qr_prefix}-${strData}`;
 }
-function parseMerchantQR(qr) {
-  const [prefix, json] = qr.split("-", 2);
-  if (prefix !== QR_CODE_PREFIX.MERCHANT) {
-    throw new Error("Lib error: Invalid QR prefix");
-  }
-  try {
-    const data = JSON.parse(json);
-    const { walletAddress, amount, concept } = data;
-    if (!walletAddress || !amount || !concept) {
-      throw new Error("Lib error: Missing fields in QR data");
+function parseMerchOrCitizenQR(qr) {
+  const [prefix, data] = qr.split("-", 2);
+  if (prefix === QR_CODE_PREFIX.MERCHANT) {
+    try {
+      const parsed = JSON.parse(data);
+      const { walletAddress, amount, concept } = parsed;
+      if (!walletAddress || !amount || !concept) {
+        throw new Error("Lib error: Missing fields in QR data");
+      }
+      return { walletAddress, amount, concept };
+    } catch (err) {
+      throw new Error("Lib error: Invalid QR data format");
     }
-    return { walletAddress, amount, concept };
-  } catch (err) {
-    throw new Error("Lib error: Invalid QR data format");
+  } else if (prefix === QR_CODE_PREFIX.CITIZEN) {
+    return { address: data };
+  } else {
+    throw new Error("Lib error: Invalid QR prefix");
   }
 }
 
@@ -1709,18 +1710,6 @@ async function getLatestBlockTimestamp() {
   return block.timestamp;
 }
 
-// src/types.ts
-var RolesType = {
-  NONE: "NONE",
-  CITIZEN: "CITIZEN",
-  MERCHANT: "MERCHANT"
-};
-var BenefitLabelsType = {
-  NONE: "NONE",
-  STATIONERY: "STATIONERY",
-  GROCERY: "GROCERY"
-};
-
 // src/methods/tokens.ts
 async function getTokenBalance(address) {
   const contract = getContract();
@@ -1730,23 +1719,16 @@ async function getTokenBalance(address) {
 async function getCitizenBenefitsType(address) {
   const contract = getContract();
   const benefit = await contract.getAttachedData(address);
-  const BENEFIT_MAP = {
-    "0x00": BenefitLabelsType.NONE,
-    "0x01": BenefitLabelsType.STATIONERY,
-    "0x02": BenefitLabelsType.GROCERY
-  };
-  return BENEFIT_MAP[benefit] ?? BenefitLabelsType.NONE;
+  return benefit;
 }
 async function getPartyPermission(address) {
   const contract = getContract();
   const timestamp = await getLatestBlockTimestamp();
-  const role = await contract.partyPermission(address, timestamp);
-  const ROLES_MAP = {
-    0: RolesType.NONE,
-    1: RolesType.CITIZEN,
-    2: RolesType.MERCHANT
-  };
-  return ROLES_MAP[role] ?? RolesType.NONE;
+  const role = await contract.partyPermission(
+    address,
+    timestamp
+  );
+  return role;
 }
 async function sendTokens(privateKey, toAddress, amount, eventData) {
   const signer = getSigner(privateKey);
@@ -1831,9 +1813,7 @@ async function processTicketImage(aid_id, imageFile, authorization) {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  BenefitLabelsType,
   QR_CODE_PREFIX,
-  RolesType,
   burnTokens,
   generateCitizenQR,
   generateMechantQR,
@@ -1841,7 +1821,7 @@ async function processTicketImage(aid_id, imageFile, authorization) {
   getPartyPermission,
   getTokenBalance,
   initTokenizationLibEnvVars,
-  parseMerchantQR,
+  parseMerchOrCitizenQR,
   processTicketImage,
   sendTokens
 });
