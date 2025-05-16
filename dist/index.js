@@ -43,7 +43,7 @@ var QR_CODE_PREFIX = {
 // src/methods/qr.ts
 function generateCitizenQR(didOrAddress) {
   const qr_prefix = QR_CODE_PREFIX.CITIZEN;
-  return `${qr_prefix}-${didOrAddress}`;
+  return `${qr_prefix}|${didOrAddress}`;
 }
 function generateMechantQR(merchantDID, citizenDID, CID) {
   const qr_prefix = QR_CODE_PREFIX.MERCHANT;
@@ -53,10 +53,10 @@ function generateMechantQR(merchantDID, citizenDID, CID) {
     CID
   };
   const strData = JSON.stringify(data);
-  return `${qr_prefix}-${strData}`;
+  return `${qr_prefix}|${strData}`;
 }
 function parseMerchOrCitizenQR(qr) {
-  const [prefix, data] = qr.split("-", 2);
+  const [prefix, data] = qr.split("|", 2);
   if (prefix === QR_CODE_PREFIX.MERCHANT) {
     try {
       const parsedData = JSON.parse(data);
