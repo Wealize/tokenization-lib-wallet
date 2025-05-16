@@ -14,24 +14,22 @@ export function generateCitizenQR(didOrAddress: string): string {
 
 /**
  * Generates a QR code string for a Merchant payment request.
- * @param walletAddress - The merchant's wallet address.
- * @param amount - The requested payment amount.
- * @param concept - The payment concept or description.
+ * @param merchantDID - The merchant's wallet DID.
+ * @param citizenDID - The citizen's wallet DID.
+ * @param CID - the CID of the IPFS file containing the Merchant's payment request.
  * @returns A formatted QR string with the MERCHANT prefix and serialized data.
  */
 export function generateMechantQR(
-  merchantAddress: string,
-  citizenAddress: string,
-  amount: string,
-  concept: string
+  merchantDID: string,
+  citizenDID: string,
+  CID: string
 ): string {
   const qr_prefix = QR_CODE_PREFIX.MERCHANT;
 
   const data: MerchantQRDataType = {
-    merchantAddress,
-    citizenAddress,
-    amount,
-    concept,
+    merchantDID,
+    citizenDID,
+    CID,
   };
 
   const strData = JSON.stringify(data);
@@ -53,14 +51,15 @@ export function parseMerchOrCitizenQR(
   if (prefix === QR_CODE_PREFIX.MERCHANT) {
     try {
       const parsedData = JSON.parse(data) as MerchantQRDataType;
-      const { merchantAddress, citizenAddress, amount, concept } = parsedData;
+      const { merchantDID, citizenDID, CID } = parsedData;
 
-      if (!merchantAddress || !citizenAddress || !amount || !concept) {
+      if (!merchantDID || !citizenDID || !CID) {
         throw new Error("Lib error: Missing fields in QR data");
       }
 
       return parsedData;
     } catch (err) {
+      console.log({ err });
       throw new Error("Lib error: Invalid QR data format");
     }
   } else if (prefix === QR_CODE_PREFIX.CITIZEN) {

@@ -7,10 +7,9 @@ export type BenefitCodeTypeNum = 0 | 1 | 2; // 0 = NONE, 1 = STATIONERY, 2 = GRO
 
 // Parsed QR result for merchant
 export type MerchantQRDataType = {
-  merchantAddress: string;
-  citizenAddress: string;
-  amount: string;
-  concept: string;
+  merchantDID: string;
+  citizenDID: string;
+  CID: string;
 };
 
 export type CitizenQRDataType = {
