@@ -38,9 +38,9 @@ Generación de strings para posterior utilización en generación de QRs
 
 - generateCitizenQR(did: string) > Genera un QR para identificar a un ciudadano.
 
-- generateMechantQR(walletAddress: string, amount: string, concept: string) > Genera un QR para pagos de comerciantes.
+- generateMechantQR(merchantDID: string, citizenDID: string, CID: string) > Genera un QR para pagos de comerciantes. El CID sera utilizado posteriormente por el ciudadano para obtener el desglose del ticket.
 
-- parseMerchantQR(qr: string) > Util que prsea un QR generado por generateMechantQR() y valida su estructura. Retorna: { walletAddress, amount, concept }.
+- parseMerchOrCitizenQR(qr: string) > Util que parsea un QR generado por generateMechantQR() o generateCitizenQR() y valida su estructura. Para ciudadanos retorna el DID que viene en el QR y para comerciantes los datos originales enviados por parametro (merchantDID: string, citizenDID: string, CID: string)
 
 ### 2. Interacción con el contrato ERC20 "izToken"
 
