@@ -9,7 +9,7 @@ import { CitizenQRDataType, MerchantQRDataType } from "../types";
 export function generateCitizenQR(didOrAddress: string): string {
   const qr_prefix = QR_CODE_PREFIX.CITIZEN;
 
-  return `${qr_prefix}-${didOrAddress}`;
+  return `${qr_prefix}|${didOrAddress}`;
 }
 
 /**
@@ -34,7 +34,7 @@ export function generateMechantQR(
 
   const strData = JSON.stringify(data);
 
-  return `${qr_prefix}-${strData}`;
+  return `${qr_prefix}|${strData}`;
 }
 
 /**
@@ -46,7 +46,7 @@ export function generateMechantQR(
 export function parseMerchOrCitizenQR(
   qr: string
 ): MerchantQRDataType | CitizenQRDataType {
-  const [prefix, data] = qr.split("-", 2);
+  const [prefix, data] = qr.split("|", 2);
 
   if (prefix === QR_CODE_PREFIX.MERCHANT) {
     try {
