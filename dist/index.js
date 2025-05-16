@@ -45,13 +45,12 @@ function generateCitizenQR(didOrAddress) {
   const qr_prefix = QR_CODE_PREFIX.CITIZEN;
   return `${qr_prefix}-${didOrAddress}`;
 }
-function generateMechantQR(merchantAddress, citizenAddress, amount, concept) {
+function generateMechantQR(merchantDID, citizenDID, CID) {
   const qr_prefix = QR_CODE_PREFIX.MERCHANT;
   const data = {
-    merchantAddress,
-    citizenAddress,
-    amount,
-    concept
+    merchantDID,
+    citizenDID,
+    CID
   };
   const strData = JSON.stringify(data);
   return `${qr_prefix}-${strData}`;
@@ -61,12 +60,13 @@ function parseMerchOrCitizenQR(qr) {
   if (prefix === QR_CODE_PREFIX.MERCHANT) {
     try {
       const parsedData = JSON.parse(data);
-      const { merchantAddress, citizenAddress, amount, concept } = parsedData;
-      if (!merchantAddress || !citizenAddress || !amount || !concept) {
+      const { merchantDID, citizenDID, CID } = parsedData;
+      if (!merchantDID || !citizenDID || !CID) {
         throw new Error("Lib error: Missing fields in QR data");
       }
       return parsedData;
     } catch (err) {
+      console.log({ err });
       throw new Error("Lib error: Invalid QR data format");
     }
   } else if (prefix === QR_CODE_PREFIX.CITIZEN) {

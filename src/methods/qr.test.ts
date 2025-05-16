@@ -7,10 +7,9 @@ import {
 } from "./qr";
 
 const validData = {
-  merchantAddress: "0xAB000",
-  citizenAddress: "0xABC123",
-  amount: 100.5,
-  concept: "Coffee Payment",
+  merchantDID: "0xAB000",
+  citizenDID: "0xABC123",
+  CID: "Coffee Payment",
 };
 
 const validQR = `${QR_CODE_PREFIX.MERCHANT}-${JSON.stringify(validData)}`;
@@ -47,45 +46,31 @@ describe("generateCitizenQR", () => {
 
 describe("generateMechantQR", () => {
   it("should generate a valid merchant QR string", () => {
-    const citizenAddress = "0xABC123";
-    const merchantAddress = "0xAB000";
-    const amount = "100.5";
-    const concept = "Coffee Payment";
+    const citizenDID = "0xABC123";
+    const merchantDID = "0xAB000";
+    const CID = "0210kxooek01w0xm";
 
     const expectedData = JSON.stringify({
-      merchantAddress,
-      citizenAddress,
-      amount,
-      concept,
+      merchantDID,
+      citizenDID,
+      CID,
     });
-    const result = generateMechantQR(
-      merchantAddress,
-      citizenAddress,
-      amount,
-      concept
-    );
+    const result = generateMechantQR(merchantDID, citizenDID, CID);
 
     expect(result).toBe(`${QR_CODE_PREFIX.MERCHANT}-${expectedData}`);
   });
 
   it("should handle empty strings correctly", () => {
-    const merchantAddress = "";
-    const citizenAddress = "";
-    const amount = "";
-    const concept = "";
+    const merchantDID = "";
+    const citizenDID = "";
+    const CID = "";
 
     const expectedData = JSON.stringify({
-      merchantAddress,
-      citizenAddress,
-      amount,
-      concept,
+      merchantDID,
+      citizenDID,
+      CID,
     });
-    const result = generateMechantQR(
-      citizenAddress,
-      merchantAddress,
-      amount,
-      concept
-    );
+    const result = generateMechantQR(citizenDID, merchantDID, CID);
 
     expect(result).toBe(`${QR_CODE_PREFIX.MERCHANT}-${expectedData}`);
   });

@@ -7,10 +7,9 @@ type RoleIdType = 0 | 1 | 2;
 type BenefitCodeType = "0x00" | "0x01" | "0x02";
 type BenefitCodeTypeNum = 0 | 1 | 2;
 type MerchantQRDataType = {
-    merchantAddress: string;
-    citizenAddress: string;
-    amount: string;
-    concept: string;
+    merchantDID: string;
+    citizenDID: string;
+    CID: string;
 };
 type CitizenQRDataType = {
     address: string;
@@ -39,12 +38,12 @@ type TicketProcessingFileType = File | Blob | RNFileType;
 declare function generateCitizenQR(didOrAddress: string): string;
 /**
  * Generates a QR code string for a Merchant payment request.
- * @param walletAddress - The merchant's wallet address.
- * @param amount - The requested payment amount.
- * @param concept - The payment concept or description.
+ * @param merchantDID - The merchant's wallet DID.
+ * @param citizenDID - The citizen's wallet DID.
+ * @param CID - the CID of the IPFS file containing the Merchant's payment request.
  * @returns A formatted QR string with the MERCHANT prefix and serialized data.
  */
-declare function generateMechantQR(merchantAddress: string, citizenAddress: string, amount: string, concept: string): string;
+declare function generateMechantQR(merchantDID: string, citizenDID: string, CID: string): string;
 /**
  * Parses a QR code string and determines whether it corresponds to a Merchant or Citizen QR.
  * @param qr - The scanned QR code string.
