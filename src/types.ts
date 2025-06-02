@@ -34,3 +34,15 @@ export type RNFileType = {
 };
 
 export type TicketProcessingFileType = File | Blob | RNFileType;
+
+export enum EUserRole {
+  NONE,
+  CITIZEN,
+  MERCHANT,
+}
+
+export enum EAidType {
+  NONE,
+  STATIONERY,
+  GROCERY,
+}

@@ -4,7 +4,7 @@ import {
   getLatestBlockTimestamp,
   getSigner,
 } from "../utils/contract";
-import { RoleIdType, BenefitCodeType } from "../types";
+import { BenefitCodeType, RoleIdType } from "../types";
 
 /**
  * Retrieves the token balance of a given address.
@@ -52,35 +52,36 @@ export async function getPartyPermission(address: string): Promise<RoleIdType> {
  * @param toAddress - The recipient's wallet address.
  * @param amount - The amount of tokens to transfer.
  * @param eventData - Optional event data to attach.
- * @returns The transaction hash of the transfer.
+ * @returns An object with the transaction hash (txHash) and receipt of the transfer.
  */
 export async function sendTokens(
   privateKey: string,
   toAddress: string,
   amount: number,
   eventData?: string
-): Promise<string> {
+): Promise<{ txHash: string; receipt: ethers.ContractReceipt }> {
   const signer = getSigner(privateKey);
   const contract = getContract(signer);
-  const fromAddress = await signer.getAddress();
   const parsedAmount = ethers.utils.parseUnits(amount.toString(), 18);
   const data = eventData ? ethers.utils.toUtf8Bytes(eventData) : "0x00";
 
   try {
-    const tx = await contract.transferFromWithData(
-      fromAddress,
-      toAddress,
-      parsedAmount,
-      data
-    );
-    return tx.hash;
-  } catch (error) {
-    const e = error as any;
-    console.error(e);
+    const tx = await contract.transferWithData(toAddress, parsedAmount, data, {
+      gasLimit: 400000,
+    });
+    const receipt = await tx.wait();
+    if (receipt.status === 0) {
+      throw new Error("Transaction reverted by the EVM");
+    }
 
-    const message =
-      e.reason || e.data?.message || e.message || "Unknown transaction error";
-    throw new Error(`Transaction Error: ${message}`);
+    return { txHash: tx.hash, receipt };
+  } catch (error) {
+    const errMsg =
+      error?.reason ||
+      error?.data?.message ||
+      error?.message ||
+      "Unknown error";
+    throw new Error(`Send Tokens Error: ${errMsg}`);
   }
 }
 
@@ -89,13 +90,13 @@ export async function sendTokens(
  * @param privateKey - The wallet's private key.
  * @param amount - The amount of tokens to burn.
  * @param eventData - Optional event data to attach.
- * @returns The transaction hash of the burn operation.
+ * @returns An object with the transaction hash (txHash) and receipt of the burn operation.
  */
 export async function burnTokens(
   privateKey: string,
   amount: number,
   eventData?: string
-): Promise<string> {
+): Promise<{ txHash: string; receipt: ethers.ContractReceipt }> {
   const signer = getSigner(privateKey);
   const contract = getContract(signer);
   const address = await signer.getAddress();
@@ -103,14 +104,22 @@ export async function burnTokens(
   const data = eventData ? ethers.utils.toUtf8Bytes(eventData) : "0x00";
 
   try {
-    const tx = await contract.redeemFrom(address, parsedAmount, data);
-    return tx.hash;
-  } catch (error) {
-    const e = error as any;
-    console.error(e);
+    const tx = await contract.redeemFrom(address, parsedAmount, data, {
+      gasLimit: 400000,
+    });
 
-    const message =
-      e.reason || e.data?.message || e.message || "Unknown Burn Tokens error";
-    throw new Error(`Burn Tokens Error: ${message}`);
+    const receipt = await tx.wait();
+    if (receipt.status === 0) {
+      throw new Error("Transaction reverted by the EVM");
+    }
+
+    return { txHash: tx.hash, receipt };
+  } catch (error) {
+    const errMsg =
+      error?.reason ||
+      error?.data?.message ||
+      error?.message ||
+      "Unknown error";
+    throw new Error(`Burn Tokens Error: ${errMsg}`);
   }
 }
