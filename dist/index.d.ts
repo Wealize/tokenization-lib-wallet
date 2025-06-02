@@ -1,3 +1,5 @@
+import { ethers } from 'ethers';
+
 declare const QR_CODE_PREFIX: {
     CITIZEN: string;
     MERCHANT: string;
@@ -29,6 +31,16 @@ type RNFileType = {
     type: string;
 };
 type TicketProcessingFileType = File | Blob | RNFileType;
+declare enum EUserRole {
+    NONE = 0,
+    CITIZEN = 1,
+    MERCHANT = 2
+}
+declare enum EAidType {
+    NONE = 0,
+    STATIONERY = 1,
+    GROCERY = 2
+}
 
 /**
  * Generates a QR code string for a Citizen DID.
@@ -77,17 +89,23 @@ declare function getPartyPermission(address: string): Promise<RoleIdType>;
  * @param toAddress - The recipient's wallet address.
  * @param amount - The amount of tokens to transfer.
  * @param eventData - Optional event data to attach.
- * @returns The transaction hash of the transfer.
+ * @returns An object with the transaction hash (txHash) and receipt of the transfer.
  */
-declare function sendTokens(privateKey: string, toAddress: string, amount: number, eventData?: string): Promise<string>;
+declare function sendTokens(privateKey: string, toAddress: string, amount: number, eventData?: string): Promise<{
+    txHash: string;
+    receipt: ethers.ContractReceipt;
+}>;
 /**
  * Burns (redeems) a specific amount of tokens from the user's wallet.
  * @param privateKey - The wallet's private key.
  * @param amount - The amount of tokens to burn.
  * @param eventData - Optional event data to attach.
- * @returns The transaction hash of the burn operation.
+ * @returns An object with the transaction hash (txHash) and receipt of the burn operation.
  */
-declare function burnTokens(privateKey: string, amount: number, eventData?: string): Promise<string>;
+declare function burnTokens(privateKey: string, amount: number, eventData?: string): Promise<{
+    txHash: string;
+    receipt: ethers.ContractReceipt;
+}>;
 
 declare function processTicketImage(aid_id: BenefitCodeTypeNum, imageFile: TicketProcessingFileType, authorization: string): Promise<TicketProcessingResultType>;
 
@@ -98,4 +116,4 @@ type EnvVarsType = {
 };
 declare function initTokenizationLibEnvVars(newVars: Partial<EnvVarsType>): void;
 
-export { type BenefitCodeType, type BenefitCodeTypeNum, type CitizenQRDataType, type MerchantQRDataType, QR_CODE_PREFIX, type RNFileType, type RoleIdType, type TicketProcessingFileType, type TicketProcessingResultType, burnTokens, generateCitizenQR, generateMechantQR, getCitizenBenefitsType, getPartyPermission, getTokenBalance, initTokenizationLibEnvVars, parseMerchOrCitizenQR, processTicketImage, sendTokens };
+export { type BenefitCodeType, type BenefitCodeTypeNum, type CitizenQRDataType, EAidType, EUserRole, type MerchantQRDataType, QR_CODE_PREFIX, type RNFileType, type RoleIdType, type TicketProcessingFileType, type TicketProcessingResultType, burnTokens, generateCitizenQR, generateMechantQR, getCitizenBenefitsType, getPartyPermission, getTokenBalance, initTokenizationLibEnvVars, parseMerchOrCitizenQR, processTicketImage, sendTokens };

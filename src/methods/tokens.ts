@@ -75,7 +75,7 @@ export async function sendTokens(
     }
 
     return { txHash: tx.hash, receipt };
-  } catch (error) {
+  } catch (error: any) {
     const errMsg =
       error?.reason ||
       error?.data?.message ||
@@ -114,7 +114,7 @@ export async function burnTokens(
     }
 
     return { txHash: tx.hash, receipt };
-  } catch (error) {
+  } catch (error: any) {
     const errMsg =
       error?.reason ||
       error?.data?.message ||

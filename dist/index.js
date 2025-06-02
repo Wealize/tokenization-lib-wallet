@@ -20,6 +20,8 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
+  EAidType: () => EAidType,
+  EUserRole: () => EUserRole,
   QR_CODE_PREFIX: () => QR_CODE_PREFIX,
   burnTokens: () => burnTokens,
   generateCitizenQR: () => generateCitizenQR,
@@ -1734,22 +1736,20 @@ async function getPartyPermission(address) {
 async function sendTokens(privateKey, toAddress, amount, eventData) {
   const signer = getSigner(privateKey);
   const contract = getContract(signer);
-  const fromAddress = await signer.getAddress();
   const parsedAmount = import_ethers3.ethers.utils.parseUnits(amount.toString(), 18);
   const data = eventData ? import_ethers3.ethers.utils.toUtf8Bytes(eventData) : "0x00";
   try {
-    const tx = await contract.transferFromWithData(
-      fromAddress,
-      toAddress,
-      parsedAmount,
-      data
-    );
-    return tx.hash;
+    const tx = await contract.transferWithData(toAddress, parsedAmount, data, {
+      gasLimit: 4e5
+    });
+    const receipt = await tx.wait();
+    if (receipt.status === 0) {
+      throw new Error("Transaction reverted by the EVM");
+    }
+    return { txHash: tx.hash, receipt };
   } catch (error) {
-    const e = error;
-    console.error(e);
-    const message = e.reason || e.data?.message || e.message || "Unknown transaction error";
-    throw new Error(`Transaction Error: ${message}`);
+    const errMsg = error?.reason || error?.data?.message || error?.message || "Unknown error";
+    throw new Error(`Send Tokens Error: ${errMsg}`);
   }
 }
 async function burnTokens(privateKey, amount, eventData) {
@@ -1759,13 +1759,17 @@ async function burnTokens(privateKey, amount, eventData) {
   const parsedAmount = import_ethers3.ethers.utils.parseUnits(amount.toString(), 18);
   const data = eventData ? import_ethers3.ethers.utils.toUtf8Bytes(eventData) : "0x00";
   try {
-    const tx = await contract.redeemFrom(address, parsedAmount, data);
-    return tx.hash;
+    const tx = await contract.redeemFrom(address, parsedAmount, data, {
+      gasLimit: 4e5
+    });
+    const receipt = await tx.wait();
+    if (receipt.status === 0) {
+      throw new Error("Transaction reverted by the EVM");
+    }
+    return { txHash: tx.hash, receipt };
   } catch (error) {
-    const e = error;
-    console.error(e);
-    const message = e.reason || e.data?.message || e.message || "Unknown Burn Tokens error";
-    throw new Error(`Burn Tokens Error: ${message}`);
+    const errMsg = error?.reason || error?.data?.message || error?.message || "Unknown error";
+    throw new Error(`Burn Tokens Error: ${errMsg}`);
   }
 }
 
@@ -1812,8 +1816,24 @@ async function processTicketImage(aid_id, imageFile, authorization) {
     throw new Error(`sendTicket Error: ${message}`);
   }
 }
+
+// src/types.ts
+var EUserRole = /* @__PURE__ */ ((EUserRole2) => {
+  EUserRole2[EUserRole2["NONE"] = 0] = "NONE";
+  EUserRole2[EUserRole2["CITIZEN"] = 1] = "CITIZEN";
+  EUserRole2[EUserRole2["MERCHANT"] = 2] = "MERCHANT";
+  return EUserRole2;
+})(EUserRole || {});
+var EAidType = /* @__PURE__ */ ((EAidType2) => {
+  EAidType2[EAidType2["NONE"] = 0] = "NONE";
+  EAidType2[EAidType2["STATIONERY"] = 1] = "STATIONERY";
+  EAidType2[EAidType2["GROCERY"] = 2] = "GROCERY";
+  return EAidType2;
+})(EAidType || {});
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  EAidType,
+  EUserRole,
   QR_CODE_PREFIX,
   burnTokens,
   generateCitizenQR,
