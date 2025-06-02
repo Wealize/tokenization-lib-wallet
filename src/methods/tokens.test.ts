@@ -17,7 +17,7 @@ describe("tokens utils", () => {
     balanceOf: vi.fn(),
     getAttachedData: vi.fn(),
     partyPermission: vi.fn(),
-    transferFromWithData: vi.fn(),
+    transferWithData: vi.fn(),
     redeemFrom: vi.fn(),
   };
 
@@ -63,23 +63,29 @@ describe("tokens utils", () => {
   });
 
   it("sendTokens returns tx hash", async () => {
-    mockContract.transferFromWithData.mockResolvedValue({ hash: "0xTXHASH" });
+    mockContract.transferWithData.mockResolvedValue({
+      hash: "0xTXHASH",
+      wait: vi.fn().mockResolvedValue({ status: 1, some: "receipt" }),
+    });
     const result = await sendTokens("privKey", "0xTO", 1, "event");
-    expect(result).toBe("0xTXHASH");
-    expect(mockContract.transferFromWithData).toHaveBeenCalled();
+    expect(result.txHash).toBe("0xTXHASH");
+    expect(result.receipt.status).toBe(1);
   });
 
   it("burnTokens returns tx hash", async () => {
-    mockContract.redeemFrom.mockResolvedValue({ hash: "0xBURNHASH" });
+    mockContract.redeemFrom.mockResolvedValue({
+      hash: "0xBURNHASH",
+      wait: vi.fn().mockResolvedValue({ status: 1, some: "receipt" }),
+    });
     const result = await burnTokens("privKey", 1, "event");
-    expect(result).toBe("0xBURNHASH");
-    expect(mockContract.redeemFrom).toHaveBeenCalled();
+    expect(result.txHash).toBe("0xBURNHASH");
+    expect(result.receipt.status).toBe(1);
   });
 
   it("sendTokens throws formatted error on fail", async () => {
-    mockContract.transferFromWithData.mockRejectedValue({ message: "Boom" });
+    mockContract.transferWithData.mockRejectedValue({ message: "Boom" });
     await expect(sendTokens("privKey", "0xTO", 1)).rejects.toThrow(
-      "Transaction Error: Boom"
+      "Send Tokens Error: Boom"
     );
   });
 
