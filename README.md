@@ -49,7 +49,8 @@ Integra ethers.js para comunicarse con los typechains pre generados del contrato
 #### Métodos
 
 - getTokenBalance(address: string) > Obtiene el balance de tokens del usuario en formato legible
-- getCitizenBenefitsType(address: string) > Retorna el tipo de beneficio asociado al usuario: 0 = NONE, 1 = STATIONERY, 2 = GROCERY.
+- getCitizenAidType(citizenAddress: string) > Retorna el tipo de beneficio asociado al usuario: 0 = NONE, 1 = STATIONERY, 2 = GROCERY.
+- getMerchantName(merchantAddress: string) > Retorna el nombre de la tienda asociada a esa direccion.
 - getPartyPermission(address: string) > Devuelve el rol actual del usuario: 0 = NONE, 1 = CITIZEN, 2 = MERCHANT.
 - sendTokens(privateKey: string, toAddress: string, amount: number, eventData?: string) > Envía tokens a otra dirección con data opcional. Devuelve el hash de la transacción.
 - burnTokens(privateKey: string, amount: number, eventData?: string) > Realiza un burn de tokens en el balance del usuario. Devuelve el hash de la transacción.
@@ -60,7 +61,7 @@ Envia tickets en formato File | Blob | RNFileType (Ver definicion de types) a la
 
 #### Método
 
-- processTicketImage(aid_id: BenefitCodeTypeNum, imageFile: TicketProcessingFileType, authorization: string): Envía una imagen de un ticket al backend para procesar sus productos y calcular la ayuda económica.
+- processTicketImage(aid_id: AidCodeType, imageFile: TicketProcessingFileType, authorization: string): Envía una imagen de un ticket al backend para procesar sus productos y calcular la ayuda económica.
 
 #### Prametros de entrada
 

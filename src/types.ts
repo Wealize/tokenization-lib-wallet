@@ -1,9 +1,6 @@
 export type RoleIdType = 0 | 1 | 2; // 0 = NONE, 1 = CITIZEN, 2 = MERCHANT
 
-// Benefit type codes (on-chain)
-export type BenefitCodeType = "0x00" | "0x01" | "0x02"; // 0x00 = NONE, 0x01 = STATIONERY, 0x02 = GROCERY
-// Benefit type codes (backend)
-export type BenefitCodeTypeNum = 0 | 1 | 2; // 0 = NONE, 1 = STATIONERY, 2 = GROCERY
+export type AidCodeType = 0 | 1 | 2; // 0 = NONE, 1 = STATIONERY, 2 = GROCERY
 
 // Parsed QR result for merchant
 export type MerchantQRDataType = {

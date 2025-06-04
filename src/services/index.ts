@@ -1,13 +1,13 @@
 import { getEnvVars } from "../config";
 import {
-  BenefitCodeTypeNum,
+  AidCodeType,
   TicketProcessingFileType,
   TicketProcessingResultType,
 } from "../types";
 import { isReactNativeFile } from "../utils/files";
 
 export async function processTicketImage(
-  aid_id: BenefitCodeTypeNum,
+  aid_id: AidCodeType,
   imageFile: TicketProcessingFileType,
   authorization: string
 ): Promise<TicketProcessingResultType> {

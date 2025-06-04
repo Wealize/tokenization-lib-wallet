@@ -6,8 +6,7 @@ declare const QR_CODE_PREFIX: {
 };
 
 type RoleIdType = 0 | 1 | 2;
-type BenefitCodeType = "0x00" | "0x01" | "0x02";
-type BenefitCodeTypeNum = 0 | 1 | 2;
+type AidCodeType = 0 | 1 | 2;
 type MerchantQRDataType = {
     merchantDID: string;
     citizenDID: string;
@@ -71,11 +70,17 @@ declare function parseMerchOrCitizenQR(qr: string): MerchantQRDataType | Citizen
  */
 declare function getTokenBalance(address: string): Promise<string>;
 /**
- * Retrieves the benefit type code assigned to a citizen's address.
- * @param address - The citizen's wallet address.
- * @returns The benefit code as a hexadecimal string.
+ * Retrieves the aid type code assigned to a citizen's address.
+ * @param citizenAddress - The citizen's wallet address.
+ * @returns The aid code as int (0, 1, 2).
  */
-declare function getCitizenBenefitsType(address: string): Promise<BenefitCodeType>;
+declare function getCitizenAidType(citizenAddress: string): Promise<AidCodeType>;
+/**
+ * Retrieves the merchant name from a specific merchant's address.
+ * @param merchantAddress - The merchantAddress's wallet address.
+ * @returns The merchang name as string.
+ */
+declare function getMerchantName(merchantAddress: string): Promise<string>;
 /**
  * Retrieves the permission role assigned to an address at the latest block timestamp.
  * @param address - The user's wallet address.
@@ -107,7 +112,7 @@ declare function burnTokens(privateKey: string, amount: number, eventData?: stri
     receipt: ethers.ContractReceipt;
 }>;
 
-declare function processTicketImage(aid_id: BenefitCodeTypeNum, imageFile: TicketProcessingFileType, authorization: string): Promise<TicketProcessingResultType>;
+declare function processTicketImage(aid_id: AidCodeType, imageFile: TicketProcessingFileType, authorization: string): Promise<TicketProcessingResultType>;
 
 type EnvVarsType = {
     BACK_END_URL: string;
@@ -116,4 +121,4 @@ type EnvVarsType = {
 };
 declare function initTokenizationLibEnvVars(newVars: Partial<EnvVarsType>): void;
 
-export { type BenefitCodeType, type BenefitCodeTypeNum, type CitizenQRDataType, EAidType, EUserRole, type MerchantQRDataType, QR_CODE_PREFIX, type RNFileType, type RoleIdType, type TicketProcessingFileType, type TicketProcessingResultType, burnTokens, generateCitizenQR, generateMechantQR, getCitizenBenefitsType, getPartyPermission, getTokenBalance, initTokenizationLibEnvVars, parseMerchOrCitizenQR, processTicketImage, sendTokens };
+export { type AidCodeType, type CitizenQRDataType, EAidType, EUserRole, type MerchantQRDataType, QR_CODE_PREFIX, type RNFileType, type RoleIdType, type TicketProcessingFileType, type TicketProcessingResultType, burnTokens, generateCitizenQR, generateMechantQR, getCitizenAidType, getMerchantName, getPartyPermission, getTokenBalance, initTokenizationLibEnvVars, parseMerchOrCitizenQR, processTicketImage, sendTokens };
