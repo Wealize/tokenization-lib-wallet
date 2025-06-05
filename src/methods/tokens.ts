@@ -4,7 +4,7 @@ import {
   getLatestBlockTimestamp,
   getSigner,
 } from "../utils/contract";
-import { BenefitCodeType, RoleIdType } from "../types";
+import { AidCodeType, RoleIdType } from "../types";
 
 /**
  * Retrieves the token balance of a given address.
@@ -18,16 +18,31 @@ export async function getTokenBalance(address: string): Promise<string> {
 }
 
 /**
- * Retrieves the benefit type code assigned to a citizen's address.
- * @param address - The citizen's wallet address.
- * @returns The benefit code as a hexadecimal string.
+ * Retrieves the aid type code assigned to a citizen's address.
+ * @param citizenAddress - The citizen's wallet address.
+ * @returns The aid code as int (0, 1, 2).
  */
-export async function getCitizenBenefitsType(
-  address: string
-): Promise<BenefitCodeType> {
+export async function getCitizenAidType(
+  citizenAddress: string
+): Promise<AidCodeType> {
   const contract = getContract();
-  const benefit = (await contract.getAttachedData(address)) as BenefitCodeType;
-  return benefit;
+  const rawAidId = await contract.getAttachedData(citizenAddress);
+  const aidType = ethers.utils.toUtf8String(rawAidId);
+  return Number(aidType) as AidCodeType;
+}
+
+/**
+ * Retrieves the merchant name from a specific merchant's address.
+ * @param merchantAddress - The merchantAddress's wallet address.
+ * @returns The merchang name as string.
+ */
+export async function getMerchantName(
+  merchantAddress: string
+): Promise<string> {
+  const contract = getContract();
+  const rawName = await contract.getAttachedData(merchantAddress);
+  const merchantName = ethers.utils.toUtf8String(rawName);
+  return merchantName;
 }
 
 /**

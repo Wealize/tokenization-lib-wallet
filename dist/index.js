@@ -26,7 +26,8 @@ __export(index_exports, {
   burnTokens: () => burnTokens,
   generateCitizenQR: () => generateCitizenQR,
   generateMechantQR: () => generateMechantQR,
-  getCitizenBenefitsType: () => getCitizenBenefitsType,
+  getCitizenAidType: () => getCitizenAidType,
+  getMerchantName: () => getMerchantName,
   getPartyPermission: () => getPartyPermission,
   getTokenBalance: () => getTokenBalance,
   initTokenizationLibEnvVars: () => initTokenizationLibEnvVars,
@@ -1719,10 +1720,17 @@ async function getTokenBalance(address) {
   const balance = await contract.balanceOf(address);
   return import_ethers3.ethers.utils.formatUnits(balance, 18);
 }
-async function getCitizenBenefitsType(address) {
+async function getCitizenAidType(citizenAddress) {
   const contract = getContract();
-  const benefit = await contract.getAttachedData(address);
-  return benefit;
+  const rawAidId = await contract.getAttachedData(citizenAddress);
+  const aidType = import_ethers3.ethers.utils.toUtf8String(rawAidId);
+  return Number(aidType);
+}
+async function getMerchantName(merchantAddress) {
+  const contract = getContract();
+  const rawName = await contract.getAttachedData(merchantAddress);
+  const merchantName = import_ethers3.ethers.utils.toUtf8String(rawName);
+  return merchantName;
 }
 async function getPartyPermission(address) {
   const contract = getContract();
@@ -1838,7 +1846,8 @@ var EAidType = /* @__PURE__ */ ((EAidType2) => {
   burnTokens,
   generateCitizenQR,
   generateMechantQR,
-  getCitizenBenefitsType,
+  getCitizenAidType,
+  getMerchantName,
   getPartyPermission,
   getTokenBalance,
   initTokenizationLibEnvVars,

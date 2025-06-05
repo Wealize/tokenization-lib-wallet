@@ -4,10 +4,11 @@ import * as ethersUtils from "ethers";
 
 import {
   getTokenBalance,
-  getCitizenBenefitsType,
+  getCitizenAidType,
   getPartyPermission,
   sendTokens,
   burnTokens,
+  getMerchantName,
 } from "./tokens";
 
 vi.mock("../utils/contract");
@@ -38,6 +39,9 @@ describe("tokens utils", () => {
     vi.spyOn(ethersUtils.ethers.utils, "parseUnits").mockImplementation(
       () => "1000000000000000000" as any
     );
+    vi.spyOn(ethersUtils.ethers.utils, "toUtf8String").mockImplementation(
+      (v: any) => v
+    );
     vi.spyOn(ethersUtils.ethers.utils, "toUtf8Bytes").mockImplementation(
       (s: string) => s as any
     );
@@ -50,10 +54,17 @@ describe("tokens utils", () => {
     expect(mockContract.balanceOf).toHaveBeenCalledWith("0xABC123");
   });
 
-  it("getCitizenBenefitsType returns correct label", async () => {
-    mockContract.getAttachedData.mockResolvedValue("0x01");
-    const result = await getCitizenBenefitsType("0xABC123");
-    expect(result).toBe("0x01");
+  it("getCitizenAidType returns correct numeric aid code", async () => {
+    mockContract.getAttachedData.mockResolvedValue("2"); // simulate UTF-8 string "2"
+    const result = await getCitizenAidType("0xABC123");
+    expect(result).toBe(2);
+  });
+
+  it("getMerchantName returns merchant name string", async () => {
+    mockContract.getAttachedData.mockResolvedValue("Supermarket XYZ");
+    const result = await getMerchantName("0xMERCHANT");
+    expect(result).toBe("Supermarket XYZ");
+    expect(mockContract.getAttachedData).toHaveBeenCalledWith("0xMERCHANT");
   });
 
   it("getPartyPermission returns correct role", async () => {
